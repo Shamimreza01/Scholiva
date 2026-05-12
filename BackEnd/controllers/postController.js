@@ -1,8 +1,8 @@
-const Post = require("../models/Post");
-const User = require("../models/User");
-const Classroom = require("../models/Classroom");
+import Post from "../models/Post.js";
+import User from "../models/User.js";
+import Classroom from "../models/Classroom.js";
 
-exports.createPost = async (req, res) => {
+export const createPost = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     if (user.role !== "teacher") {
@@ -26,7 +26,7 @@ exports.createPost = async (req, res) => {
   }
 };
 
-exports.getPosts = async (req, res) => {
+export const getPosts = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     let query = { visibility: "public" };
@@ -87,7 +87,7 @@ exports.getPosts = async (req, res) => {
   }
 };
 
-exports.sharePost = async (req, res) => {
+export const sharePost = async (req, res) => {
   try {
     const originalPost = await Post.findById(req.params.id);
     if (!originalPost)
@@ -119,7 +119,7 @@ exports.sharePost = async (req, res) => {
   }
 };
 
-exports.interactWithPost = async (req, res) => {
+export const interactWithPost = async (req, res) => {
   try {
     const { id } = req.params;
     const { type } = req.body; // 'like' or 'dislike'
@@ -142,7 +142,7 @@ exports.interactWithPost = async (req, res) => {
   }
 };
 
-exports.addComment = async (req, res) => {
+export const addComment = async (req, res) => {
   try {
     const { id } = req.params;
     const { content } = req.body;
@@ -163,7 +163,7 @@ exports.addComment = async (req, res) => {
   }
 };
 
-exports.deleteComment = async (req, res) => {
+export const deleteComment = async (req, res) => {
   try {
     const { id, commentId } = req.params;
     const post = await Post.findById(id);
@@ -188,7 +188,7 @@ exports.deleteComment = async (req, res) => {
   }
 };
 
-exports.deletePost = async (req, res) => {
+export const deletePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (!post || post.teacher.toString() !== req.user.id) {

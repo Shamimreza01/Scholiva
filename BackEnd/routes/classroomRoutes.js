@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import * as classroomController from '../controllers/classroomController.js';
+import { auth, checkRole } from '../middleware/auth.js';
+
 const router = express.Router();
-const classroomController = require('../controllers/classroomController');
-const { auth, checkRole } = require('../middleware/auth');
 
 router.post('/', auth, checkRole(['teacher']), classroomController.createClassroom);
 router.get('/', auth, checkRole(['teacher']), classroomController.getClassrooms);
@@ -11,4 +12,4 @@ router.get('/:id/rankings', auth, classroomController.getClassroomRankings);
 router.post('/:id/join', auth, checkRole(['student']), classroomController.requestToJoin);
 router.post('/:id/requests', auth, checkRole(['teacher']), classroomController.handleJoinRequest);
 
-module.exports = router;
+export default router;

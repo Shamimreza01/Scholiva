@@ -13,6 +13,7 @@ import Feed from "./pages/Feed";
 import FindTeachers from "./pages/FindTeachers";
 import Login from "./pages/Login";
 import MyLearning from "./pages/MyLearning";
+import Quizzes from "./pages/Quizzes";
 import ProfileSettings from "./pages/ProfileSettings";
 import QuizPage from "./pages/QuizPage";
 import Rankings from "./pages/Rankings";
@@ -43,6 +44,7 @@ function App() {
             <Route path="/feed" element={<Feed />} />
             <Route path="/dashboard" element={<Feed />} />
             <Route path="/my-learning" element={<MyLearning />} />
+            <Route path="/quizzes" element={<Quizzes />} />
             <Route path="/classrooms" element={<Classrooms />} />
             <Route path="/classroom/:id" element={<ClassroomDetail />} />
             <Route path="/requests" element={<Requests />} />

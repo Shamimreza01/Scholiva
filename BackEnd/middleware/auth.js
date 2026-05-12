@@ -1,6 +1,6 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
-const auth = (req, res, next) => {
+export const auth = (req, res, next) => {
   const token = req.header('x-auth-token');
   if (!token) return res.status(401).json({ message: 'No token, authorization denied' });
 
@@ -13,11 +13,9 @@ const auth = (req, res, next) => {
   }
 };
 
-const checkRole = (roles) => (req, res, next) => {
+export const checkRole = (roles) => (req, res, next) => {
   if (!roles.includes(req.user.role)) {
     return res.status(403).json({ message: 'Access denied' });
   }
   next();
 };
-
-module.exports = { auth, checkRole };

@@ -1,6 +1,9 @@
-const cloudinary = require('cloudinary').v2;
-const multer = require('multer');
-const User = require('../models/User');
+import { v2 as cloudinary } from 'cloudinary';
+import multer from 'multer';
+import User from '../models/User.js';
+import Classroom from '../models/Classroom.js';
+import Quiz from '../models/Quiz.js';
+import Submission from '../models/Submission.js';
 
 // Cloudinary Config (User needs to provide these in .env)
 cloudinary.config({
@@ -12,9 +15,9 @@ cloudinary.config({
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-exports.uploadMiddleware = upload.single('profilePicture');
+export const uploadMiddleware = upload.single('profilePicture');
 
-exports.updateProfile = async (req, res) => {
+export const updateProfile = async (req, res) => {
   try {
     const { name, bio, education, twitter, linkedin, github } = req.body;
     let profilePictureUrl = '';
@@ -65,7 +68,7 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-exports.getTeachers = async (req, res) => {
+export const getTeachers = async (req, res) => {
   try {
     const teachers = await User.find({ role: 'teacher' }).select('-password');
     res.json(teachers);
@@ -74,7 +77,7 @@ exports.getTeachers = async (req, res) => {
   }
 };
 
-exports.getProfile = async (req, res) => {
+export const getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
     res.json(user);
@@ -83,7 +86,7 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-exports.getUserById = async (req, res) => {
+export const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select('-password');
     res.json(user);
@@ -92,7 +95,7 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-exports.requestConnection = async (req, res) => {
+export const requestConnection = async (req, res) => {
   try {
     const teacher = await User.findById(req.params.id);
     if (!teacher || teacher.role !== 'teacher') return res.status(404).json({ message: 'Teacher not found' });
@@ -109,7 +112,7 @@ exports.requestConnection = async (req, res) => {
   }
 };
 
-exports.handleConnectionRequest = async (req, res) => {
+export const handleConnectionRequest = async (req, res) => {
   try {
     const { studentId, action } = req.body;
     const teacher = await User.findById(req.user.id);
@@ -128,12 +131,9 @@ exports.handleConnectionRequest = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-exports.getStudentLearningStats = async (req, res) => {
-  try {
-    const Classroom = require('../models/Classroom');
-    const Quiz = require('../models/Quiz');
-    const Submission = require('../models/Submission');
 
+export const getStudentLearningStats = async (req, res) => {
+  try {
     const classrooms = await Classroom.find({ students: req.user.id })
       .populate('teacher', 'name profilePicture');
 

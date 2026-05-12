@@ -1,8 +1,8 @@
-const Quiz = require('../models/Quiz');
-const Classroom = require('../models/Classroom');
-const User = require('../models/User');
+import Quiz from '../models/Quiz.js';
+import Classroom from '../models/Classroom.js';
+import User from '../models/User.js';
 
-exports.createQuiz = async (req, res) => {
+export const createQuiz = async (req, res) => {
   try {
     const { title, duration, negativeMarking, questions, visibility, classroomId } = req.body;
     const quiz = new Quiz({
@@ -21,7 +21,7 @@ exports.createQuiz = async (req, res) => {
   }
 };
 
-exports.getQuizzes = async (req, res) => {
+export const getQuizzes = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     
@@ -57,7 +57,7 @@ exports.getQuizzes = async (req, res) => {
   }
 };
 
-exports.getTeacherQuizzes = async (req, res) => {
+export const getTeacherQuizzes = async (req, res) => {
   try {
     const quizzes = await Quiz.find({ teacher: req.user.id });
     res.json(quizzes);
@@ -66,7 +66,7 @@ exports.getTeacherQuizzes = async (req, res) => {
   }
 };
 
-exports.updateQuiz = async (req, res) => {
+export const updateQuiz = async (req, res) => {
   try {
     const { title, duration, negativeMarking, questions, visibility, classroomId } = req.body;
     const quiz = await Quiz.findById(req.params.id);
@@ -89,7 +89,7 @@ exports.updateQuiz = async (req, res) => {
   }
 };
 
-exports.getQuizById = async (req, res) => {
+export const getQuizById = async (req, res) => {
   try {
     const quiz = await Quiz.findById(req.params.id);
     if (!quiz) return res.status(404).json({ message: 'Quiz not found' });

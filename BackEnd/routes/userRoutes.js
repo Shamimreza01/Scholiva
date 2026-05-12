@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import * as userController from '../controllers/userController.js';
+import { auth, checkRole } from '../middleware/auth.js';
+
 const router = express.Router();
-const userController = require('../controllers/userController');
-const { auth, checkRole } = require('../middleware/auth');
 
 router.get('/teachers', auth, userController.getTeachers);
 router.get('/profile', auth, userController.getProfile);
@@ -11,4 +12,4 @@ router.get('/:id', auth, userController.getUserById);
 router.post('/connect/:id', auth, checkRole(['student']), userController.requestConnection);
 router.post('/requests', auth, checkRole(['teacher']), userController.handleConnectionRequest);
 
-module.exports = router;
+export default router;

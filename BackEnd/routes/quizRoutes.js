@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import * as quizController from '../controllers/quizController.js';
+import { auth, checkRole } from '../middleware/auth.js';
+
 const router = express.Router();
-const quizController = require('../controllers/quizController');
-const { auth, checkRole } = require('../middleware/auth');
 
 router.post('/', auth, checkRole(['teacher']), quizController.createQuiz);
 router.get('/', auth, quizController.getQuizzes);
@@ -9,4 +10,4 @@ router.get('/teacher', auth, checkRole(['teacher']), quizController.getTeacherQu
 router.get('/:id', auth, quizController.getQuizById);
 router.put('/:id', auth, checkRole(['teacher']), quizController.updateQuiz);
 
-module.exports = router;
+export default router;

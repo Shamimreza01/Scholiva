@@ -29,9 +29,9 @@ export default function MainLayout() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans flex flex-col md:flex-row relative">
+    <div className="min-h-screen bg-slate-50 font-sans flex flex-col md:flex-row">
       <Sidebar user={user} onLogout={handleLogout} />
-      <main className="flex-1 p-4 md:p-12 overflow-y-auto">
+      <main className="flex-1 min-h-screen overflow-y-auto p-4 md:p-10 lg:p-12">
         <Outlet context={{ user, fetchProfile }} />
       </main>
     </div>

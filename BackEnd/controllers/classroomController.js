@@ -1,7 +1,9 @@
-const Classroom = require('../models/Classroom');
-const User = require('../models/User');
+import Classroom from '../models/Classroom.js';
+import User from '../models/User.js';
+import Quiz from '../models/Quiz.js';
+import Submission from '../models/Submission.js';
 
-exports.createClassroom = async (req, res) => {
+export const createClassroom = async (req, res) => {
   try {
     const { name, description } = req.body;
     const classroom = new Classroom({
@@ -16,7 +18,7 @@ exports.createClassroom = async (req, res) => {
   }
 };
 
-exports.getClassrooms = async (req, res) => {
+export const getClassrooms = async (req, res) => {
   try {
     const classrooms = await Classroom.find({ teacher: req.user.id })
       .populate({ path: 'students', select: 'name email', model: 'User' })
@@ -27,7 +29,7 @@ exports.getClassrooms = async (req, res) => {
   }
 };
 
-exports.getClassroomById = async (req, res) => {
+export const getClassroomById = async (req, res) => {
   try {
     const classroom = await Classroom.findById(req.params.id)
       .populate('teacher', 'name')
@@ -50,28 +52,25 @@ exports.getClassroomById = async (req, res) => {
   }
 };
 
-exports.getClassroomRankings = async (req, res) => {
+export const getClassroomRankings = async (req, res) => {
   try {
-    const Quiz = require('../models/Quiz');
-    const Submission = require('../models/Submission');
-
     const quizzes = await Quiz.find({ classroomId: req.params.id });
     const quizIds = quizzes.map(q => q._id);
 
     const submissions = await Submission.find({ quiz: { $in: quizIds } })
-      .populate('user', 'name')
+      .populate('student', 'name')
       .sort({ score: -1 });
 
     // Aggregate unique student stats
     const studentMap = new Map();
 
     submissions.forEach(r => {
-      if (!r.user) return; // Skip if user no longer exists
-      const studentId = r.user._id.toString();
+      if (!r.student) return; // Skip if student no longer exists
+      const studentId = r.student._id.toString();
       
       if (!studentMap.has(studentId)) {
         studentMap.set(studentId, {
-          name: r.user.name,
+          name: r.student.name,
           totalScore: r.score,
           quizzesTaken: 1,
           avgScore: r.score
@@ -90,7 +89,7 @@ exports.getClassroomRankings = async (req, res) => {
   }
 };
 
-exports.requestToJoin = async (req, res) => {
+export const requestToJoin = async (req, res) => {
   try {
     const classroom = await Classroom.findById(req.params.id);
     if (!classroom) return res.status(404).json({ message: 'Classroom not found' });
@@ -112,7 +111,7 @@ exports.requestToJoin = async (req, res) => {
   }
 };
 
-exports.handleJoinRequest = async (req, res) => {
+export const handleJoinRequest = async (req, res) => {
   try {
     const { studentId, action } = req.body;
     const classroomId = req.params.id;
@@ -134,7 +133,7 @@ exports.handleJoinRequest = async (req, res) => {
   }
 };
 
-exports.getAvailableClassrooms = async (req, res) => {
+export const getAvailableClassrooms = async (req, res) => {
   try {
     const classrooms = await Classroom.find().populate('teacher', 'name');
     res.json(classrooms);

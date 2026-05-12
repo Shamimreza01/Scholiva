@@ -1,7 +1,7 @@
-const Submission = require('../models/Submission');
-const Quiz = require('../models/Quiz');
+import Submission from '../models/Submission.js';
+import Quiz from '../models/Quiz.js';
 
-exports.submitQuiz = async (req, res) => {
+export const submitQuiz = async (req, res) => {
   try {
     const { quizId, answers, timeTaken } = req.body;
     const quiz = await Quiz.findById(quizId);
@@ -47,7 +47,7 @@ exports.submitQuiz = async (req, res) => {
   }
 };
 
-exports.getMySubmissions = async (req, res) => {
+export const getMySubmissions = async (req, res) => {
   try {
     const submissions = await Submission.find({ student: req.user.id }).populate('quiz', 'title');
     res.json(submissions);
@@ -56,7 +56,7 @@ exports.getMySubmissions = async (req, res) => {
   }
 };
 
-exports.getSubmissionById = async (req, res) => {
+export const getSubmissionById = async (req, res) => {
   try {
     const submission = await Submission.findById(req.params.id).populate('quiz');
     if (!submission) {
@@ -75,7 +75,7 @@ exports.getSubmissionById = async (req, res) => {
 };
 
 // Teacher View: Serial student list marked-wise
-exports.getQuizSubmissions = async (req, res) => {
+export const getQuizSubmissions = async (req, res) => {
   try {
     const submissions = await Submission.find({ quiz: req.params.quizId })
       .populate('student', 'name email')
@@ -85,7 +85,8 @@ exports.getQuizSubmissions = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-exports.getMySubmissionByQuiz = async (req, res) => {
+
+export const getMySubmissionByQuiz = async (req, res) => {
   try {
     const submission = await Submission.findOne({ 
       student: req.user.id, 
