@@ -5,24 +5,20 @@ export default function ClassroomCard({ classroom, user, onJoin, onRequestManage
   const navigate = useNavigate();
   const isTeacher = user.role === "teacher";
   const isMember = classroom.students?.some(
-    (s) => s._id === user._id || s === user._id,
+    (s) => (s._id || s) === user._id
   );
   const isPending = classroom.requests?.some(
-    (r) => r._id === user._id || r === user._id,
+    (r) => (r.student?._id || r.student || r) === user._id
   );
 
   const handleCardClick = () => {
-    if (isTeacher || isMember) {
-      navigate(`/classroom/${classroom._id}`);
-    }
+    navigate(`/classroom/${classroom._id}`);
   };
 
   return (
     <div 
       onClick={handleCardClick}
-      className={`bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm transition-all relative overflow-hidden ${
-        (isTeacher || isMember) ? 'cursor-pointer hover:shadow-xl hover:-translate-y-1' : 'opacity-80'
-      }`}
+      className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm transition-all relative overflow-hidden cursor-pointer hover:shadow-xl hover:-translate-y-1"
     >
       {isTeacher && classroom.requests?.length > 0 && (
         <button 

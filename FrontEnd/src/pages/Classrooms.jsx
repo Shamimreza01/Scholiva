@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import api from '../utils/api';
 import { useToast } from '../context/ToastContext';
 import { Plus, Check } from 'lucide-react';
@@ -13,10 +13,10 @@ export default function Classrooms() {
   const { showToast } = useToast();
   const [classrooms, setClassrooms] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedClassId, setSelectedClassId] = useState(null);
   const [activeRequestRoom, setActiveRequestRoom] = useState(null);
   const [pendingAction, setPendingAction] = useState(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchClassrooms();
@@ -34,16 +34,7 @@ export default function Classrooms() {
     } catch (err) { console.error(err); }
   };
 
-  const handleJoinClassroom = async () => {
-    if (!selectedClassId) return;
-    setLoading(true);
-    try {
-      showToast("Join request sent!", "success");
-      fetchClassrooms();
-      setSelectedClassId(null);
-    } catch (err) { showToast("Request failed", "error"); }
-    finally { setLoading(false); }
-  };
+
 
   const handleRequestAction = async () => {
     if (!pendingAction) return;
@@ -82,9 +73,9 @@ export default function Classrooms() {
       <ClassroomModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
-        onCreate={async (name) => {
+        onCreate={async (name, description, admissionQuestions) => {
           try { 
-            await api.post('/classrooms', { name }); 
+            await api.post('/classrooms', { name, description, admissionQuestions }); 
             showToast("Classroom created!", "success");
             fetchClassrooms(); 
           } 
@@ -100,15 +91,13 @@ export default function Classrooms() {
       />
 
       <ConfirmModal 
-        isOpen={!!selectedClassId || !!pendingAction}
-        onClose={() => { setSelectedClassId(null); setPendingAction(null); }}
-        onConfirm={selectedClassId ? handleJoinClassroom : handleRequestAction}
+        isOpen={!!pendingAction}
+        onClose={() => setPendingAction(null)}
+        onConfirm={handleRequestAction}
         loading={loading}
-        title={selectedClassId ? "Join Classroom" : (pendingAction?.action === 'accept' ? 'Approve Student' : 'Reject Student')}
-        message={selectedClassId 
-          ? "Are you sure you want to request to join this classroom?" 
-          : `Are you sure you want to ${pendingAction?.action} the request from ${pendingAction?.name}?`}
-        confirmText={selectedClassId ? "Send Request" : (pendingAction?.action === 'accept' ? 'Approve' : 'Reject')}
+        title={pendingAction?.action === 'accept' ? 'Approve Student' : 'Reject Student'}
+        message={`Are you sure you want to ${pendingAction?.action} the request from ${pendingAction?.name}?`}
+        confirmText={pendingAction?.action === 'accept' ? 'Approve' : 'Reject'}
       />
 
       {/* Student: Joined Rooms */}
@@ -136,7 +125,7 @@ export default function Classrooms() {
               key={c._id} 
               classroom={c} 
               user={user} 
-              onJoin={(id) => setSelectedClassId(id)} 
+              onJoin={(id) => navigate(`/classroom/${id}`)} 
               onRequestManage={(room) => setActiveRequestRoom(room)}
             />
           ))}

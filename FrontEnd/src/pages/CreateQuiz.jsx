@@ -135,7 +135,7 @@ export default function CreateQuiz() {
         await api.post("/quizzes", payload);
       }
       showToast(id ? "Quiz updated!" : "Quiz published!", "success");
-      navigate("/dashboard");
+      navigate("/assessment-studio");
     } catch (err) {
       showToast("Failed to save quiz", "error");
     }
@@ -152,11 +152,11 @@ export default function CreateQuiz() {
     <div className="min-h-screen bg-slate-50 py-6 md:py-12 px-4 md:px-6 font-sans">
       <div className="max-w-4xl mx-auto">
         <button
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigate("/assessment-studio")}
           className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 font-bold mb-6 md:mb-10 transition-colors group"
         >
           <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          Back to Dashboard
+          Back to Assessment Studio
         </button>
 
         <form onSubmit={handleSubmit} className="space-y-6 md:space-y-10">

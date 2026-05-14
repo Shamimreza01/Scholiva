@@ -7,6 +7,12 @@ export const submitQuiz = async (req, res) => {
     const quiz = await Quiz.findById(quizId);
     if (!quiz) return res.status(404).json({ message: 'Quiz not found' });
 
+    // Prevent duplicate submissions
+    const existingSubmission = await Submission.findOne({ student: req.user.id, quiz: quizId });
+    if (existingSubmission) {
+      return res.json(existingSubmission);
+    }
+
     let score = 0;
     const evaluatedAnswers = answers.map(ans => {
       const question = quiz.questions[ans.questionIndex];

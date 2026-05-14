@@ -90,6 +90,10 @@ export default function QuizPage() {
   }, [status, timeLeft]);
 
   const startQuiz = () => {
+    if (quiz?.alreadySubmitted) {
+      fetchSubmissionByQuiz();
+      return;
+    }
     setStatus("playing");
     setTimeLeft(quiz.duration);
   };

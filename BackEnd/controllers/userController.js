@@ -198,3 +198,40 @@ export const getStudentLearningStats = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+export const searchUsers = async (req, res) => {
+  try {
+    const { query, role } = req.query;
+
+    const user = await User.findById(req.user.id);
+    let roleFilter = role;
+    
+    // Privacy Rule: Students can ONLY search for faculty/teachers
+    if (user.role === 'student') {
+      roleFilter = 'teacher';
+    }
+
+    const filter = {
+      $and: [
+        { _id: { $ne: req.user.id } } // Don't search for self
+      ]
+    };
+
+    if (query) {
+      filter.$and.push({
+        $or: [
+          { name: { $regex: query, $options: 'i' } },
+          { email: { $regex: query, $options: 'i' } }
+        ]
+      });
+    }
+
+    if (roleFilter) {
+      filter.$and.push({ role: roleFilter });
+    }
+
+    const users = await User.find(filter).select('name email role profilePicture education bio').limit(20);
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

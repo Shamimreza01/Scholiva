@@ -12,6 +12,8 @@ import {
   ThumbsUp,
   Trash2,
   UserRound,
+  Globe,
+  Users,
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -61,81 +63,82 @@ export default function PostCard({
   };
 
   return (
-    <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden group">
+    <div className="bg-white rounded-[24px] border border-slate-200/60 shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
       {post.isShared && (
-        <div className="bg-indigo-50/50 px-8 py-3 border-b border-slate-50 flex items-center gap-2 text-indigo-600">
-          <Repeat className="w-4 h-4" />
-          <p className="text-[10px] font-black uppercase tracking-widest">
-            {post.teacher.name} shared {post.parentPost?.teacher?.name || "a"}'s
-            post
+        <div className="bg-slate-50 px-6 py-2.5 border-b border-slate-100 flex items-center gap-2 text-slate-500">
+          <Repeat className="w-3.5 h-3.5" />
+          <p className="text-[11px] font-bold">
+            {post.teacher?.name} shared a post
           </p>
         </div>
       )}
-      <div className="p-8 relative">
-        {user._id === post.teacher._id && (
+      <div className="p-6 relative">
+        {user._id === (post.teacher?._id || post.teacher) && (
           <button
             onClick={confirmDelete}
-            className="absolute top-8 right-8 text-slate-200 hover:text-rose-500 transition-colors"
+            className="absolute top-6 right-6 p-2 rounded-full hover:bg-rose-50 text-slate-300 hover:text-rose-500 transition-all opacity-0 group-hover:opacity-100"
           >
-            <Trash2 className="w-5 h-5" />
+            <Trash2 className="w-4 h-4" />
           </button>
         )}
-        <div className="flex items-center gap-3 mb-6">
-          <div
-            className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-              post.visibility === "public"
-                ? "bg-emerald-50 text-emerald-600"
-                : post.visibility === "protected"
-                  ? "bg-indigo-50 text-indigo-600"
-                  : "bg-rose-50 text-rose-600"
-            }`}
-          >
-            {post.teacher?.profilePicture ? (
-              <img
-                src={post.teacher?.profilePicture}
-                className="w-12 h-12 rounded-full object-cover"
-              />
-            ) : post.visibility === "public" ? (
-              <UserRound className="w-5 h-5" />
-            ) : post.visibility === "protected" ? (
-              <ShieldCheck className="w-5 h-5" />
-            ) : (
-              <Lock className="w-5 h-5" />
-            )}
-            {}
+        <div className="flex items-center gap-3 mb-5">
+          <div className="relative">
+            <div className="w-12 h-12 rounded-full border border-slate-100 overflow-hidden bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-lg">
+              {post.teacher?.profilePicture ? (
+                <img src={post.teacher.profilePicture} className="w-full h-full object-cover" />
+              ) : (
+                post.teacher?.name?.[0] || '?'
+              )}
+            </div>
+            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-50">
+              {post.visibility === "public" ? (
+                <Globe className="w-3 h-3 text-emerald-500" />
+              ) : post.visibility === "protected" ? (
+                <Users className="w-3 h-3 text-indigo-500" />
+              ) : (
+                <Lock className="w-3 h-3 text-rose-500" />
+              )}
+            </div>
           </div>
           <div>
-            <p
-              onClick={() => navigate(`/user/${teacherId}`)}
-              className="font-bold cursor-pointer text-slate-900"
-            >
-              {post.teacher.name}
-            </p>
-            <div className="flex items-center gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-              <span className="flex items-center gap-1">
-                <Calendar className="w-3 h-3" />{" "}
-                {new Date(post.createdAt).toLocaleDateString()}
+            <div className="flex items-center gap-2">
+              <p
+                onClick={() => navigate(`/user/${teacherId}`)}
+                className="font-bold cursor-pointer text-slate-900 hover:text-indigo-600 transition-colors"
+              >
+                {post.teacher?.name}
+              </p>
+              <span className="w-1 h-1 bg-slate-300 rounded-full" />
+              <span className="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full uppercase tracking-tighter">
+                Instructor
               </span>
-              <span>{post.visibility}</span>
+            </div>
+            <div className="flex items-center gap-2 mt-0.5 text-[11px] font-medium text-slate-400">
+              <span>{new Date(post.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+              <span>•</span>
+              <span className="capitalize">{post.visibility}</span>
               {post.classroomId && (
-                <span
-                  className="flex items-center gap-1 cursor-pointer text-indigo-400 hover:text-indigo-600 transition-colors"
-                  onClick={() => navigate(`/classroom/${classroomId}`)}
-                >
-                  <BookOpen className="w-3 h-3" />{" "}
-                  {post.classroomId.name || "Classroom"}
-                </span>
+                <>
+                  <span>•</span>
+                  <span
+                    className="cursor-pointer text-slate-500 hover:text-indigo-600 transition-colors font-bold"
+                    onClick={() => navigate(`/classroom/${classroomId}`)}
+                  >
+                    {post.classroomId.name || "Classroom"}
+                  </span>
+                </>
               )}
             </div>
           </div>
         </div>
-        <h3 className="text-xl font-bold text-slate-900 mb-4">{post.title}</h3>
-        <p className="text-slate-600 leading-relaxed wrap-break-word mb-8">
+
+        <h3 className="text-xl font-bold text-slate-900 mb-2 leading-tight">{post.title}</h3>
+        <p className="text-slate-600 leading-relaxed wrap-break-word mb-6 text-[15px]">
           {post.content}
         </p>
 
         {videoId && (
-          <div className="mb-8 rounded-[24px] overflow-hidden aspect-video bg-slate-100 shadow-inner">
+          <div className="mb-6 rounded-2xl overflow-hidden aspect-video bg-slate-100 border border-slate-100 shadow-sm">
             <iframe
               width="100%"
               height="100%"
@@ -149,7 +152,7 @@ export default function PostCard({
         )}
 
         {fbVideoUrl && (
-          <div className="mb-8 rounded-[24px] overflow-hidden aspect-video bg-slate-100 shadow-inner">
+          <div className="mb-6 rounded-2xl overflow-hidden aspect-video bg-slate-100 border border-slate-100 shadow-sm">
             <iframe
               src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(fbVideoUrl)}&show_text=0&width=560`}
               width="100%"
@@ -163,46 +166,45 @@ export default function PostCard({
           </div>
         )}
 
-        <div className="flex items-center gap-6 pt-6 border-t border-slate-50">
-          <button
-            onClick={() => onInteract(post._id, "like")}
-            className={`flex items-center gap-2 font-bold text-xs transition-all ${hasLiked ? "text-indigo-600 scale-110" : "text-slate-400 hover:text-indigo-600"}`}
-          >
-            <ThumbsUp
-              className={`w-5 h-5 ${hasLiked ? "fill-indigo-600" : ""}`}
-            />{" "}
-            {post.likes?.length || 0}
-          </button>
-          <button
-            onClick={() => onInteract(post._id, "dislike")}
-            className={`flex items-center gap-2 font-bold text-xs transition-all ${hasDisliked ? "text-rose-600 scale-110" : "text-slate-400 hover:text-rose-600"}`}
-          >
-            <ThumbsDown
-              className={`w-5 h-5 ${hasDisliked ? "fill-rose-600" : ""}`}
-            />{" "}
-            {post.dislikes?.length || 0}
-          </button>
-          <button
-            onClick={handleShare}
-            className={`flex items-center gap-2 font-bold text-xs transition-all ${isShared ? "text-emerald-500" : "text-slate-400 hover:text-indigo-600"}`}
-          >
-            {isShared ? (
-              <CheckCircle className="w-5 h-5" />
-            ) : (
-              <Share2 className="w-5 h-5" />
-            )}
-            {isShared ? "Copied!" : `${post.shares?.length || 0} `}
-          </button>
-          <div className="flex items-center gap-2 font-bold text-xs text-slate-400 ml-auto">
-            <MessageCircle className="w-5 h-5" />{" "}
-            {post.comments?.length || 0}{" "}
+        <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => onInteract(post._id, "like")}
+              className={`flex items-center gap-2 px-3 py-2 rounded-xl font-bold text-xs transition-all ${hasLiked ? "bg-indigo-50 text-indigo-600" : "text-slate-500 hover:bg-slate-50"}`}
+            >
+              <ThumbsUp className={`w-4 h-4 ${hasLiked ? "fill-indigo-600" : ""}`} />
+              <span>{post.likes?.length || 0}</span>
+            </button>
+            <button
+              onClick={() => onInteract(post._id, "dislike")}
+              className={`flex items-center gap-2 px-3 py-2 rounded-xl font-bold text-xs transition-all ${hasDisliked ? "bg-rose-50 text-rose-600" : "text-slate-500 hover:bg-slate-50"}`}
+            >
+              <ThumbsDown className={`w-4 h-4 ${hasDisliked ? "fill-rose-600" : ""}`} />
+              <span>{post.dislikes?.length || 0}</span>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-1">
+             <button
+              className="flex items-center gap-2 px-3 py-2 rounded-xl font-bold text-xs text-slate-500 hover:bg-slate-50 transition-all"
+            >
+              <MessageCircle className="w-4 h-4" />
+              <span>{post.comments?.length || 0}</span>
+            </button>
+            <button
+              onClick={handleShare}
+              className={`flex items-center gap-2 px-3 py-2 rounded-xl font-bold text-xs transition-all ${isShared ? "bg-emerald-50 text-emerald-600" : "text-slate-500 hover:bg-slate-50"}`}
+            >
+              {isShared ? <CheckCircle className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
+              <span>{isShared ? "Copied" : post.shares?.length || 0}</span>
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="bg-slate-50/50 p-8 space-y-6">
-        <div className="space-y-4">
-          {post.comments?.map((comment, i) => (
+      <div className="bg-slate-50/40 px-6 py-6 border-t border-slate-100/60">
+        <div className="space-y-4 mb-6">
+          {post.comments?.slice(0, 3).map((comment, i) => (
             <CommentCard
               key={i}
               comment={comment}
@@ -211,30 +213,41 @@ export default function PostCard({
               confirmDeleteComment={onDeleteComment}
             />
           ))}
+          {post.comments?.length > 3 && (
+            <button className="text-[11px] font-bold text-indigo-600 hover:underline pl-12">
+              View {post.comments.length - 3} more comments
+            </button>
+          )}
         </div>
 
         <form
           onSubmit={(e) => {
             e.preventDefault();
+            if (!commentContent.trim()) return;
             onComment(post._id, commentContent);
             setCommentContent("");
           }}
-          className="flex gap-3"
+          className="flex gap-2"
         >
-          <input
-            type="text"
-            required
-            placeholder="Write a comment..."
-            className="flex-1 px-5 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium text-sm shadow-sm"
-            value={commentContent}
-            onChange={(e) => setCommentContent(e.target.value)}
-          />
-          <button
-            type="submit"
-            className="bg-indigo-600 text-white p-3 rounded-xl shadow-lg shadow-indigo-100 hover:scale-105 transition-all"
-          >
-            <Send className="w-4 h-4" />
-          </button>
+          <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-xs overflow-hidden shrink-0 border border-white shadow-sm">
+            {user.profilePicture ? <img src={user.profilePicture} className="w-full h-full object-cover" /> : user.name[0]}
+          </div>
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              required
+              placeholder="Write a professional response..."
+              className="w-full px-4 py-2 bg-white border border-slate-200 rounded-full focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium text-[13px] outline-none shadow-sm pr-10"
+              value={commentContent}
+              onChange={(e) => setCommentContent(e.target.value)}
+            />
+            <button
+              type="submit"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-full transition-all"
+            >
+              <Send className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </form>
       </div>
     </div>

@@ -42,7 +42,7 @@ export const getQuizzes = async (req, res) => {
           classroomId: { $in: classroomIds } 
         }
       ]
-    }).populate('teacher', 'name');
+    }).populate('teacher', 'name').sort({ createdAt: -1 });
 
     const quizzesWithStatus = quizzes.map(quiz => {
       const quizObj = quiz.toObject();
@@ -59,7 +59,7 @@ export const getQuizzes = async (req, res) => {
 
 export const getTeacherQuizzes = async (req, res) => {
   try {
-    const quizzes = await Quiz.find({ teacher: req.user.id });
+    const quizzes = await Quiz.find({ teacher: req.user.id }).sort({ createdAt: -1 });
     res.json(quizzes);
   } catch (err) {
     res.status(500).json({ message: err.message });

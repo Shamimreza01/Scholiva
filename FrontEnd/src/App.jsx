@@ -6,11 +6,12 @@ import {
 } from "react-router-dom";
 import MainLayout from "./components/MainLayout";
 import { ToastProvider } from "./context/ToastContext";
+import AssessmentStudio from "./pages/AssessmentStudio";
 import ClassroomDetail from "./pages/ClassroomDetail";
 import Classrooms from "./pages/Classrooms";
 import CreateQuiz from "./pages/CreateQuiz";
 import Feed from "./pages/Feed";
-import FindTeachers from "./pages/FindTeachers";
+import UserSearch from "./pages/UserSearch";
 import Login from "./pages/Login";
 import MyLearning from "./pages/MyLearning";
 import Quizzes from "./pages/Quizzes";
@@ -48,7 +49,8 @@ function App() {
             <Route path="/classrooms" element={<Classrooms />} />
             <Route path="/classroom/:id" element={<ClassroomDetail />} />
             <Route path="/requests" element={<Requests />} />
-            <Route path="/find-teachers" element={<FindTeachers />} />
+            <Route path="/search" element={<UserSearch />} />
+            <Route path="/assessment-studio" element={<AssessmentStudio />} />
             <Route path="/create-quiz" element={<CreateQuiz />} />
             <Route path="/edit-quiz/:id" element={<CreateQuiz />} />
             <Route path="/user/:id" element={<UserProfile />} />
