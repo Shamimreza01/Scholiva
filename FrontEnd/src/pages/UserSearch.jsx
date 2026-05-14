@@ -3,6 +3,7 @@ import { Search, User, Mail, GraduationCap, Users, Filter, ChevronRight, Loader2
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../utils/api";
 import { useNavigate, useOutletContext } from "react-router-dom";
+import UserSkeleton from "../components/Directory/UserSkeleton";
 
 export default function UserSearch() {
   const { user: currentUser } = useOutletContext();
@@ -93,9 +94,13 @@ export default function UserSearch() {
       {/* Results Section */}
       <div className="max-w-5xl mx-auto px-6 py-10">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mb-4" />
-            <p className="text-slate-500 font-bold">Scanning the directory...</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <UserSkeleton />
+            <UserSkeleton />
+            <UserSkeleton />
+            <UserSkeleton />
+            <UserSkeleton />
+            <UserSkeleton />
           </div>
         ) : users.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -161,12 +166,7 @@ export default function UserSearch() {
             <h3 className="text-slate-900 font-bold text-lg">No matches found</h3>
             <p className="text-slate-500 mt-1">Try adjusting your search terms or filters.</p>
           </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mb-4" />
-            <p className="text-slate-500 font-bold">Loading faculty members...</p>
-          </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

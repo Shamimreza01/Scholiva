@@ -2,6 +2,7 @@ import { Send, Image, PlusCircle, Globe, Lock, Users, MessageSquarePlus } from "
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import PostCard from "../components/Feed/PostCard";
+import PostSkeleton from "../components/Feed/PostSkeleton";
 import api from "../utils/api";
 import Modal from "../components/UI/Modal";
 import { motion } from "framer-motion";
@@ -221,24 +222,34 @@ export default function Feed() {
       </Modal>
 
       <div className="space-y-8">
-        {posts.map((post) => (
-          <PostCard
-            key={post._id}
-            post={post}
-            user={user}
-            onDelete={handleDelete}
-            onInteract={handleInteract}
-            onShare={handleShare}
-            onComment={handleComment}
-            onDeleteComment={handleDeleteComment}
-          />
-        ))}
-        {posts.length === 0 && !loading && (
-          <div className="text-center py-20 bg-slate-100/50 rounded-[40px] border-2 border-dashed border-slate-200">
-            <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">
-              No posts to show yet.
-            </p>
-          </div>
+        {loading ? (
+          <>
+            <PostSkeleton />
+            <PostSkeleton />
+            <PostSkeleton />
+          </>
+        ) : (
+          <>
+            {posts.map((post) => (
+              <PostCard
+                key={post._id}
+                post={post}
+                user={user}
+                onDelete={handleDelete}
+                onInteract={handleInteract}
+                onShare={handleShare}
+                onComment={handleComment}
+                onDeleteComment={handleDeleteComment}
+              />
+            ))}
+            {posts.length === 0 && (
+              <div className="text-center py-20 bg-slate-100/50 rounded-[40px] border-2 border-dashed border-slate-200">
+                <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">
+                  No posts to show yet.
+                </p>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
