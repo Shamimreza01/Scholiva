@@ -4,6 +4,9 @@ import User from '../models/User.js';
 
 export const createQuiz = async (req, res) => {
   try {
+    if (req.user.role !== 'teacher') {
+      return res.status(403).json({ message: 'Only teachers can create quizzes' });
+    }
     const { title, duration, negativeMarking, questions, visibility, classroomId } = req.body;
     const quiz = new Quiz({
       title,
@@ -71,8 +74,8 @@ export const updateQuiz = async (req, res) => {
     const { title, duration, negativeMarking, questions, visibility, classroomId } = req.body;
     const quiz = await Quiz.findById(req.params.id);
     
-    if (!quiz || quiz.teacher.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Unauthorized' });
+    if (!quiz || quiz.teacher.toString() !== req.user.id || req.user.role !== 'teacher') {
+      return res.status(403).json({ message: 'Unauthorized: Only the assigned teacher can edit this quiz' });
     }
 
     quiz.title = title || quiz.title;
@@ -94,19 +97,31 @@ export const getQuizById = async (req, res) => {
     const quiz = await Quiz.findById(req.params.id);
     if (!quiz) return res.status(404).json({ message: 'Quiz not found' });
 
-    // Student Access Logic
+    // Security: If student and not submitted, strip the correct answers
     if (req.user.role === 'student') {
       const hasSubmitted = quiz.results.some(r => r.studentId.toString() === req.user.id);
       
-      if (hasSubmitted) {
-        return res.json({ ...quiz.toObject(), alreadySubmitted: true });
-      }
+      if (!hasSubmitted) {
+        // Create a safe version of the questions without correct answers
+        const safeQuestions = quiz.questions.map(q => {
+          const { correctAnswer, ...rest } = q.toObject();
+          return rest;
+        });
 
-      // Track that they viewed the questions (Entry tracking)
-      const hasEntered = quiz.participants.some(id => id.toString() === req.user.id);
-      if (!hasEntered) {
-        quiz.participants.push(req.user.id);
-        await quiz.save();
+        // Track that they viewed the questions (Entry tracking)
+        const hasEntered = quiz.participants.some(id => id.toString() === req.user.id);
+        if (!hasEntered) {
+          quiz.participants.push(req.user.id);
+          await quiz.save();
+        }
+
+        return res.json({ 
+          ...quiz.toObject(), 
+          questions: safeQuestions, 
+          alreadySubmitted: false 
+        });
+      } else {
+        return res.json({ ...quiz.toObject(), alreadySubmitted: true });
       }
     }
 

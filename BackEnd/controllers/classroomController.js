@@ -6,6 +6,9 @@ import Post from '../models/Post.js';
 
 export const createClassroom = async (req, res) => {
   try {
+    if (req.user.role !== 'teacher') {
+      return res.status(403).json({ message: 'Only teachers can create classrooms' });
+    }
     const { name, description, admissionQuestions } = req.body;
     const classroom = new Classroom({
       name,
@@ -127,7 +130,10 @@ export const handleJoinRequest = async (req, res) => {
     classroom.requests = classroom.requests.filter(r => r.student.toString() !== studentId);
 
     if (action === 'accept') {
-      classroom.students.push(studentId);
+      const alreadyIn = classroom.students.some(id => id.toString() === studentId);
+      if (!alreadyIn) {
+        classroom.students.push(studentId);
+      }
     }
 
     await classroom.save();

@@ -29,13 +29,15 @@ export const createPost = async (req, res) => {
 export const getPosts = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
     let query = { visibility: "public" };
 
     if (user.role === "teacher") {
-      // Teachers see their own posts + public posts
       query = { $or: [{ teacher: req.user.id }, { visibility: "public" }] };
     } else {
-      // Students see public + protected (if connected) + private (if in classroom)
       const teacherIds = user.connections.map((c) => c.toString());
       const classrooms = await Classroom.find({ students: req.user.id });
       const classroomIds = classrooms.map((c) => c._id.toString());
@@ -49,7 +51,11 @@ export const getPosts = async (req, res) => {
       };
     }
 
+    const totalPosts = await Post.countDocuments(query);
     const posts = await Post.find(query)
+      .sort({ createdAt: -1 }) // Optimized: Newest first for Infinite Scroll
+      .skip(skip)
+      .limit(limit)
       .populate("teacher", "name role profilePicture")
       .populate("classroomId", "name")
       .populate({
@@ -58,30 +64,12 @@ export const getPosts = async (req, res) => {
       })
       .populate("comments.user", "name profilePicture");
 
-    // EDUCONNECT RANKING ALGORITHM
-    const rankedPosts = posts.map((post) => {
-      const likes = post.likes?.length || 0;
-      const dislikes = post.dislikes?.length || 0;
-      const comments = post.comments?.length || 0;
-      const shares = post.shares?.length || 0;
-
-      // Calculate engagement score (Shares have high weight)
-      const engagement = 1 + likes * 2 + shares * 3 + comments - dislikes * 0.5;
-
-      // Calculate age in hours
-      const hoursSincePost =
-        (Date.now() - new Date(post.createdAt).getTime()) / (1000 * 60 * 60);
-
-      // Gravity / Time-decay factor
-      const score = engagement / Math.pow(hoursSincePost + 2, 1.5);
-
-      return { ...post._doc, rankScore: score };
+    res.json({
+      posts,
+      currentPage: page,
+      totalPages: Math.ceil(totalPosts / limit),
+      hasMore: skip + posts.length < totalPosts,
     });
-
-    // Sort by rank score descending
-    rankedPosts.sort((a, b) => b.rankScore - a.rankScore);
-
-    res.json(rankedPosts);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

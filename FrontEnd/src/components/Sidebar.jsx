@@ -27,15 +27,13 @@ import {
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
-export default function Sidebar({ user, onLogout }) {
-  const [isOpen, setIsOpen] = useState(false);
+export default function Sidebar({ user, onLogout, isOpen, onClose }) {
   const navigate = useNavigate();
-  const close = () => setIsOpen(false);
 
   const NavItem = ({ to, icon, label, badge, color = "indigo" }) => (
     <NavLink
       to={to}
-      onClick={close}
+      onClick={onClose}
       className={({ isActive }) =>
         `group flex items-center gap-3 px-2 py-2 rounded-xl font-medium text-[14px] transition-all duration-200 ${
           isActive
@@ -68,32 +66,22 @@ export default function Sidebar({ user, onLogout }) {
 
   return (
     <>
-      {/* Mobile Trigger */}
-      <header className="md:hidden fixed top-4 left-4 z-[60]">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="p-3 rounded-full bg-white shadow-xl border border-slate-100 text-slate-600 active:scale-95 transition-all"
-        >
-          {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
-      </header>
-
       {/* Overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[55] md:hidden transition-all duration-300"
-          onClick={close}
+          onClick={onClose}
         />
       )}
 
       {/* Main Sidebar */}
       <aside
         className={`
-          fixed md:sticky top-0 left-0 h-screen w-[320px] z-[58]
-          bg-[#F7F8FA] border-r border-slate-200/60
+          fixed top-0 md:left-0 h-screen w-[320px] z-[58]
+          bg-[#F7F8FA] border-l md:border-r border-slate-200/60
           flex flex-col overflow-hidden
           transition-all duration-400 cubic-bezier(0.4, 0, 0.2, 1)
-          ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+          ${isOpen ? "right-0 translate-x-0" : "right-0 translate-x-full md:translate-x-0"}
         `}
       >
         {/* Top Branding & Profile Area */}
@@ -107,7 +95,7 @@ export default function Sidebar({ user, onLogout }) {
 
           {/* User Card - Facebook Style */}
           <div 
-            onClick={() => { navigate(`/user/${user._id}`); close(); }}
+            onClick={() => { navigate(`/user/${user._id}`); onClose(); }}
             className="flex items-center gap-4 p-2 -mx-2 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer group"
           >
             <div className="relative">
@@ -186,7 +174,7 @@ export default function Sidebar({ user, onLogout }) {
         <div className="p-4 bg-white border-t border-slate-100 mt-auto shadow-[0_-4px_12px_rgba(0,0,0,0.02)]">
           <div className="grid grid-cols-2 gap-2">
             <button
-              onClick={() => { navigate("/settings"); close(); }}
+              onClick={() => { navigate("/settings"); onClose(); }}
               className="flex flex-col items-center gap-1.5 py-3 rounded-2xl hover:bg-slate-50 text-slate-500 hover:text-indigo-600 transition-all border border-transparent hover:border-slate-100"
             >
               <Settings className="w-5 h-5" />

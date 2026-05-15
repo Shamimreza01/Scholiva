@@ -18,49 +18,58 @@ export default function ClassroomCard({ classroom, user, onJoin, onRequestManage
   return (
     <div 
       onClick={handleCardClick}
-      className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm transition-all relative overflow-hidden cursor-pointer hover:shadow-xl hover:-translate-y-1"
+      className="bg-white p-5 md:p-7 rounded-[28px] md:rounded-[32px] border border-slate-100 shadow-sm transition-all relative overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-1.5 group"
     >
       {isTeacher && classroom.requests?.length > 0 && (
-        <button 
-          onClick={(e) => { e.stopPropagation(); onRequestManage(classroom); }}
-          className="absolute top-6 right-6 bg-rose-500 text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg shadow-rose-100 animate-bounce z-10"
-        >
+        <div className="absolute top-4 right-4 bg-rose-500 text-white text-[9px] font-black px-2.5 py-1 rounded-lg shadow-lg shadow-rose-200 animate-pulse z-10">
           {classroom.requests.length} NEW
-        </button>
+        </div>
       )}
-      <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center mb-6 text-indigo-600">
-        <Users className="w-6 h-6" />
+      
+      <div className="flex items-start justify-between mb-5">
+        <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 group-hover:scale-110 transition-transform">
+          <Users className="w-6 h-6" />
+        </div>
       </div>
-      <h3 className="text-xl font-bold text-slate-900 mb-2">
-        {classroom.name}
-      </h3>
-      <p className="text-sm text-slate-400 font-medium mb-6">
-        {isTeacher
-          ? `${classroom.students.length} Members`
-          : `By ${classroom.teacher.name}`}
-      </p>
+
+      <div className="space-y-1 mb-6">
+        <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">
+          {classroom.name}
+        </h3>
+        <p className="text-[12px] text-slate-400 font-bold uppercase tracking-widest">
+          {isTeacher
+            ? `Admin Portfolio`
+            : `Instructor: ${classroom.teacher.name.split(" ")[0]}`}
+        </p>
+      </div>
 
       {!isTeacher ? (
         <button
           onClick={(e) => { e.stopPropagation(); onJoin(classroom._id); }}
           disabled={isMember || isPending}
-          className="w-full py-4 rounded-xl font-black text-sm transition-all bg-indigo-600 text-white disabled:bg-slate-100 disabled:text-slate-400"
+          className={`w-full py-3.5 rounded-xl font-black text-[13px] transition-all ${
+            isMember 
+              ? "bg-emerald-50 text-emerald-600 hover:bg-emerald-100" 
+              : isPending 
+                ? "bg-slate-50 text-slate-400 cursor-not-allowed" 
+                : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-100"
+          }`}
         >
-          {isMember ? "View Room" : isPending ? "Pending" : "Request to Join"}
+          {isMember ? "Enter Classroom" : isPending ? "Waiting for Approval" : "Request Admission"}
         </button>
       ) : (
-        <div className="flex gap-2">
-          <div className="flex-1 bg-slate-50 p-3 rounded-xl text-center">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-              Members
+        <div className="grid grid-cols-2 gap-2.5">
+          <div className="bg-slate-50/80 p-3 rounded-2xl text-center border border-transparent hover:border-slate-100 transition-colors">
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
+              Scholars
             </p>
             <p className="font-bold text-slate-900">
               {classroom.students.length}
             </p>
           </div>
-          <div className="flex-1 bg-indigo-50 p-3 rounded-xl text-center">
-            <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">
-              Pending
+          <div className="bg-indigo-50/50 p-3 rounded-2xl text-center border border-transparent hover:border-indigo-100 transition-colors">
+            <p className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-1">
+              Requests
             </p>
             <p className="font-bold text-indigo-600">
               {classroom.requests.length}
